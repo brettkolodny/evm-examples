@@ -6,6 +6,7 @@ import { expect, use } from "chai";
 import { deployContract, solidity } from "ethereum-waffle";
 import { Contract } from "ethers";
 import Prices from "../build/Prices.json";
+import ADDRESS from "@acala-network/contracts/utils/Address";
 
 use(solidity);
 use(evmChai);
@@ -71,37 +72,38 @@ describe("Prices", () => {
   });
 
   it("getPrice works", async () => {
-    await feedValues("XBTC", 34_500);
-    expect(
-      await prices.getPrice("0x0000000000000000000000000000000000000803")
-    ).to.equal(34_500);
+  console.log(ADDRESS.DOT);
+      await feedValues("XBTC", 34_500);
+      expect(
+        await prices.getPrice(ADDRESS.XBTC)
+      ).to.equal(34_500);
 
-    await feedValues("XBTC", 33_800);
-    expect(
-      await prices.getPrice("0x0000000000000000000000000000000000000803")
-    ).to.equal(33_800);
+      await feedValues("XBTC", 33_800);
+      expect(
+        await prices.getPrice(ADDRESS.XBTC)
+      ).to.equal(33_800);
 
-    await feedValues("DOT", 15);
-    expect(
-      await prices.getPrice("0x0000000000000000000000000000000000000802")
-    ).to.equal(15);
+      await feedValues("DOT", 15);
+      expect(
+        await prices.getPrice(ADDRESS.DOT)
+      ).to.equal(15);
 
-    await feedValues("DOT", 16);
-    expect(
-      await prices.getPrice("0x0000000000000000000000000000000000000802")
-    ).to.equal(16);
+      await feedValues("DOT", 16);
+      expect(
+        await prices.getPrice(ADDRESS.DOT)
+      ).to.equal(16);
   });
 
   it("ignores invalid address", async () => {
     // system contract addresses start with 12 zero bytes
     await expect(
       prices.getPrice("0x0000000000000000000000010000000000000000")
-    ).to.be.revertedWith("Oracle: Not a system contract");
+    ).to.be.revertedWith("not a system contract");
     await expect(
       prices.getPrice("0x1000000000000000000000000000000000000000")
-    ).to.be.revertedWith("Oracle: Not a system contract");
+    ).to.be.revertedWith("not a system contract");
     // not MultiCurrency token
-    await expect(prices.getPrice("0x0000000000000000000000000000000000000806"))
+    await expect(prices.getPrice("0x0000000000000000000000000000000000000000"))
       .to.be.reverted;
   });
 });
